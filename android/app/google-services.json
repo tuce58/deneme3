@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "166669397200",
+    "project_id": "deneme3ogrenci",
+    "storage_bucket": "deneme3ogrenci.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166669397200:android:0cdbbcf6a166835ceac2d5",
+        "android_client_info": {
+          "package_name": "com.example.deneme3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzyagpN52gKWj5X9EsOyeXGnB3Rpkmcy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
