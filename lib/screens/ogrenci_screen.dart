@@ -3,16 +3,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentFormPage extends StatefulWidget {
-  final String studentId; // Öğrenci ID'si alınıyor
+  final String studentId;
 
-  StudentFormPage({required this.studentId});  // Öğrenci ID'sini alıyoruz
+  StudentFormPage({required this.studentId});
 
   @override
   _StudentFormPageState createState() => _StudentFormPageState();
 }
 
 class _StudentFormPageState extends State<StudentFormPage> {
-  // TextEditingController'lar
   final TextEditingController adController = TextEditingController();
   final TextEditingController soyadController = TextEditingController();
   final TextEditingController tcKimlikController = TextEditingController();
@@ -21,29 +20,24 @@ class _StudentFormPageState extends State<StudentFormPage> {
   final TextEditingController telefonController = TextEditingController();
   final TextEditingController adresController = TextEditingController();
   final TextEditingController dogumTarihiController = TextEditingController();
-  final TextEditingController aboutMeController = TextEditingController();
   final TextEditingController profileImageUrlController = TextEditingController();
-  final TextEditingController mentorNameController = TextEditingController();
-  final TextEditingController mentorImageUrlController = TextEditingController();
 
-  // Seçimler için değişkenler
-  String? selectedSinif;
-  String? selectedUniversite;
-  String? selectedBolum;
+  String? selectedSinif = 'Belirtilmedi';
+  String? selectedUniversite = 'Belirtilmedi';
+  String? selectedBolum = 'Belirtilmedi';
+  String? selectedIlgiliAlan = 'Belirtilmedi';
   bool mezuniyetBilgisi = false;
 
-  final firestoreRef = FirebaseFirestore.instance; // Firestore referansı
+  final firestoreRef = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
 
-    // Öğrenci bilgilerini Firestore'dan çekme
     firestoreRef.collection("students").doc(widget.studentId).get().then((snapshot) {
       if (snapshot.exists) {
         final data = snapshot.data() as Map<String, dynamic>;
 
-        // Öğrenci bilgilerini TextField'lara yerleştirme
         adController.text = data['ad'] ?? '';
         soyadController.text = data['soyad'] ?? '';
         tcKimlikController.text = data['tc_kimlik'] ?? '';
@@ -52,51 +46,55 @@ class _StudentFormPageState extends State<StudentFormPage> {
         telefonController.text = data['telefon'] ?? '';
         adresController.text = data['adres'] ?? '';
         dogumTarihiController.text = data['dogum_tarihi'] ?? '';
-        aboutMeController.text = data['aboutMe'] ?? '';
         profileImageUrlController.text = data['profileImageUrl'] ?? '';
-        mentorNameController.text = data['mentorName'] ?? '';
-        mentorImageUrlController.text = data['mentorImageUrl'] ?? '';
 
-        selectedSinif = data['sinif'];
-        selectedUniversite = data['universite'];
-        selectedBolum = data['bolum'];
-        mezuniyetBilgisi = data['mezuniyet_bilgisi'] ?? false;
+        setState(() {
+          selectedSinif = data['sinif'] ?? 'Belirtilmedi';
+          selectedUniversite = data['universite'] ?? 'Belirtilmedi';
+          selectedBolum = data['bolum'] ?? 'Belirtilmedi';
+          mezuniyetBilgisi = data['mezuniyet_bilgisi'] ?? false;
+          selectedIlgiliAlan = data['ilgiliAlan'] ?? 'Belirtilmedi';
+        });
       }
     });
   }
 
   void saveData() {
     if (adController.text.isNotEmpty && soyadController.text.isNotEmpty) {
-      firestoreRef.collection("students").doc(widget.studentId).update({
-        'ad': adController.text,
-        'soyad': soyadController.text,
-        'tc_kimlik': tcKimlikController.text,
-        'sifre': sifreController.text,
-        'eposta': epostaController.text,
-        'telefon': telefonController.text,
-        'adres': adresController.text,
-        'dogum_tarihi': dogumTarihiController.text,
-        'sinif': selectedSinif ?? 'Belirtilmedi',
-        'universite': selectedUniversite ?? 'Belirtilmedi',
-        'bolum': selectedBolum ?? 'Belirtilmedi',
-        'mezuniyet_bilgisi': mezuniyetBilgisi,
-        'aboutMe': aboutMeController.text,
-        'profileImageUrl': profileImageUrlController.text,
-        'mentorName': mentorNameController.text,
-        'mentorImageUrl': mentorImageUrlController.text,
-      }).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Veri başarıyla güncellendi.'))
-        );
-      }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Hata: $error'))
-        );
+      firestoreRef.collection("students").doc(widget.studentId).get().then((snapshot) {
+        final studentData = {
+          'ad': adController.text,
+          'soyad': soyadController.text,
+          'tc_kimlik': tcKimlikController.text,
+          'sifre': sifreController.text,
+          'eposta': epostaController.text,
+          'telefon': telefonController.text,
+          'adres': adresController.text,
+          'dogum_tarihi': dogumTarihiController.text,
+          'sinif': selectedSinif,
+          'universite': selectedUniversite,
+          'bolum': selectedBolum,
+          'mezuniyet_bilgisi': mezuniyetBilgisi,
+          'profileImageUrl': profileImageUrlController.text,
+          'ilgiliAlan': selectedIlgiliAlan,
+        };
+
+        if (snapshot.exists) {
+          firestoreRef.collection("students").doc(widget.studentId).update(studentData).then((_) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Veri başarıyla güncellendi.')));
+          }).catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $error')));
+          });
+        } else {
+          firestoreRef.collection("students").doc(widget.studentId).set(studentData).then((_) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Veri başarıyla kaydedildi.')));
+          }).catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $error')));
+          });
+        }
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ad ve Soyad alanları zorunludur!'))
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ad ve Soyad alanları zorunludur!')));
     }
   }
 
@@ -122,13 +120,31 @@ class _StudentFormPageState extends State<StudentFormPage> {
             _buildTextField(telefonController, 'Telefon', TextInputType.phone),
             _buildTextField(adresController, 'Adres'),
             _buildTextField(dogumTarihiController, 'Doğum Tarihi (DD/AA/YYYY)', TextInputType.datetime),
-            _buildTextField(aboutMeController, 'Hakkında Açıklama'),
             _buildTextField(profileImageUrlController, 'Profil Fotoğrafı URL\'si'),
-            _buildTextField(mentorNameController, 'Mentor Adı'),
-            _buildTextField(mentorImageUrlController, 'Mentor Fotoğrafı URL\'si'),
-            _buildDropdown(selectedSinif, 'Sınıf', ['1. Sınıf', '2. Sınıf', '3. Sınıf', '4. Sınıf']),
-            _buildDropdown(selectedUniversite, 'Üniversite', ['Üniversite A', 'Üniversite B', 'Üniversite C']),
-            _buildDropdown(selectedBolum, 'Bölüm', ['Bilgisayar Mühendisliği', 'Elektrik-Elektronik', 'Makine Mühendisliği']),
+            _buildDropdown(
+              selectedSinif,
+              'Sınıf',
+              ['Belirtilmedi', '1. Sınıf', '2. Sınıf', '3. Sınıf', '4. Sınıf'],
+                  (value) => setState(() => selectedSinif = value),
+            ),
+            _buildDropdown(
+              selectedUniversite,
+              'Üniversite',
+              ['Belirtilmedi', 'Üniversite A', 'Üniversite B', 'Üniversite C'],
+                  (value) => setState(() => selectedUniversite = value),
+            ),
+            _buildDropdown(
+              selectedBolum,
+              'Bölüm',
+              ['Belirtilmedi', 'Bilgisayar Mühendisliği', 'Elektrik-Elektronik', 'Makine Mühendisliği'],
+                  (value) => setState(() => selectedBolum = value),
+            ),
+            _buildDropdown(
+              selectedIlgiliAlan,
+              'İlgili Alan',
+              ['Belirtilmedi', 'Web', 'Mobil', 'Veri', 'Oyun'],
+                  (value) => setState(() => selectedIlgiliAlan = value),
+            ),
             CheckboxListTile(
               title: Text('Mezuniyet Bilgisi'),
               value: mezuniyetBilgisi,
@@ -147,7 +163,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                   textStyle: TextStyle(fontSize: 16),
                 ),
                 onPressed: saveData,
-                child: Text('Güncelle'),
+                child: Text('Kaydet ve Güncelle'),
               ),
             ),
           ],
@@ -172,7 +188,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
     );
   }
 
-  Widget _buildDropdown(String? selectedValue, String label, List<String> items) {
+  Widget _buildDropdown(String? selectedValue, String label, List<String> items, ValueChanged<String?> onChanged) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0),
       child: DropdownButtonFormField<String>(
@@ -184,11 +200,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
             child: Text(item),
           );
         }).toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedValue = value;
-          });
-        },
+        onChanged: onChanged,
       ),
     );
   }

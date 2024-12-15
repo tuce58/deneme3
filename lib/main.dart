@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'mentor_profile_screen.dart'; // Mevcut MentorProfileScreenNoAppointment dosyası
-
+/*
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
+*/
 /*
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,13 +75,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Mentör Bilgi Sistemi',
-      home: StudentFormPage(),
+      home: StudentFormPage(studentId: 'HK5Ai0WZ36T0MqTQIDiZ',),
     );
   }
 }
-*/
 
-/*
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Firebase'i başlatıyoruz.
@@ -94,12 +94,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Mentor Bilgi Sistemi',
-      home: MentorFormPage(),
+      home: MentorFormPage(mentorId: '3X0hEJNbRW3VVGKtR5uz',),
     );
   }
 }
 */
-/*
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -117,8 +117,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MentorFormPage(mentorId: '',), // Burayı MentorFormPage olarak değiştiriyoruz.
+      home: MentorFormPage(mentorId: 'FEd7LMC49lAsDHaxFe6J',), // Burayı MentorFormPage olarak değiştiriyoruz.
     );
   }
 }
-*/
